@@ -1,7 +1,7 @@
 
 
 
-def __init__(self, private_key=None, public_key=None:
+def __init__(self, private_key=None, public_key=None):
     if private_key is not None and public_key is not None:
         #decode keys
     #generate keys
