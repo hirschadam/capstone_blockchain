@@ -29,11 +29,11 @@ def verify(self, signature, message, public_key=None):
     @return         True or False
     @return_type    boolean
     """
-    if public_key igs not None:
+    if public_key is not None:
         #sign and return if true
 
 def getBalance(self, address):
     #query any full node using supplied address
 
 def makeTx(self, to, amount):
-    sig = self.sign
+    #sig = self.sign
