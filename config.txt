@@ -1,7 +1,9 @@
-listeningPort=
-sendingPort=
-genesis_hash=
+node_name=Ryan's Node
+node_id=1
 node_ip=127.0.0.1
+listeningPort=8484
+sendingPort=8485
+genesis_hash=
 version=
 whitelist=
 blacklist=
