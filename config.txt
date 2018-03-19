@@ -1,8 +1,10 @@
-port=
+listeningPort=
+sendingPort=
 genesis_hash=
 node_ip=127.0.0.1
 version=
 whitelist=
 blacklist=
+neighbors=peers.txt
 show_address="yes"
 accept_peers="yes"
