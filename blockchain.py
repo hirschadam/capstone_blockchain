@@ -19,9 +19,6 @@ class Blockchain:
     def getBlock(self, hash):
         return self.chain[hash]
 
-    def calculateHashForBlock(block):
-        return block.calculateHash()
-
     def isValidBlock(self, block):
         prevBlock = self.getBlock(self.block.prevHash)
         if prevBlock.index+1 != block.index:
@@ -42,3 +39,5 @@ class Blockchain:
                 return False
             currBlock = self.getBlock(currBlock.prevHash)
         return True
+
+    
