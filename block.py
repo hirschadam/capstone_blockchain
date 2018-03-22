@@ -23,14 +23,17 @@ class Block:
         totalValIn = 0.0
         totalValOut = 0.0
         for inputDict in transaction.inputs:
-            ref_tx = unSpentTransactions[inputDict['hash']]
-            ref_out = ref_tx.outputs[inputDict['index']]
-            pub_key = ref_out['pub_key']
-            signature = inputDict['signature']
-            vk = VerifyingKey.from_string(pub_key, curve=NIST384p)
-            if not vk.verify(signature, rf_tx.getDataString):
-                return False
-            totalValIn += ref_out['value']
+            if inputDict['hash'] == 'BLOCK-REWARD':
+                totalValIn += 5  # Assuming constant reward for now...
+            else:
+                ref_tx = unSpentTransactions[inputDict['hash']]
+                ref_out = ref_tx.outputs[inputDict['index']]
+                pub_key = ref_out['pub_key']
+                signature = inputDict['signature']
+                vk = VerifyingKey.from_string(pub_key, curve=NIST384p)
+                if not vk.verify(signature, rf_tx.getDataString):
+                    return False
+                totalValIn += ref_out['value']
         for outputDict in transaction.outputs:
             totalValOut += outputDict['value']
         return totalValIn == totalValOut
@@ -48,10 +51,15 @@ class Block:
             return True
         return False
 
-
     def isValid(self, unSpentTransactions):
+        rewardCount = 0
         for transaction in self.transactions:
             if not self.isValidTransaction(transaction, unSpentTransactions):
+                return False
+            for outputDict in transaction.outputs:
+                if outputDict['hash'] == 'BLOCK-REWARD':
+                    rewardCount += 1
+            if rewardCount > 1:
                 return False
         return self.currHash == self.calculateHash()
 
