@@ -27,10 +27,13 @@ class Transaction:
         self.hash = self.calculateHash()
 
     def calculateHash(self):
+        sha = hashlib.sha256(self.getDataString())
+        return str(sha.hexdigest())
+
+    def getDataString(self):
         value = ""
         for inputDict in self.inputs:
             value += inputDict['hash'] + str(inputDict['index']) + str(inputDict['signature'])
         for outputDict in self.outputs:
             value += outputDict['pub_key'] + str(outputDict['val'])
-        sha = hashlib.sha256(value.encode('utf-8'))
-        return str(sha.hexdigest())
+        return value.encode('utf-8')

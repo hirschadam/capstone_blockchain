@@ -5,7 +5,7 @@ from block import Block
 class Blockchain:
     def __init__(self):
         self.chain = {}
-        self.genesisBlock = Block(0, '0', 1518809761.5113006, "kek")
+        self.genesisBlock = Block(0, 'kek', 1518809761.5113006)
         self.chain[genesisBlock.currHash] = self.genesisBlock
         self.tailBlockHash = genesisBlock.currHash
 
@@ -39,5 +39,3 @@ class Blockchain:
                 return False
             currBlock = self.getBlock(currBlock.prevHash)
         return True
-
-    
