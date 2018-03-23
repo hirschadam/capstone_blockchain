@@ -47,6 +47,7 @@ class Transaction:
             if inputDict['hash'] == 'BLOCK-REWARD':
                 totalValIn += 5  # Assuming constant reward for now...
             else:
+                # TODO: change to dict of outputs
                 ref_tx = unSpentTransactions[inputDict['hash']]
                 ref_out = ref_tx.outputs[inputDict['index']]
                 pub_key = ref_out['pub_key']

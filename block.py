@@ -20,7 +20,7 @@ class Block:
 
 
     def addTransaction(self, transaction, unSpentTransactions):
-        if self.isValidTransaction(transaction, unSpentTransactions):
+        if transaction.isValid(unSpentTransactions):
             self.transactions[transaction.hash] = transaction
             return True
         return False
@@ -34,7 +34,7 @@ class Block:
     def isValid(self, unSpentTransactions):
         rewardCount = 0
         for transaction in self.transactions:
-            if not self.isValidTransaction(transaction, unSpentTransactions):
+            if not transaction.isValid(unSpentTransactions):
                 return False
             for outputDict in transaction.outputs:
                 if outputDict['hash'] == 'BLOCK-REWARD':
