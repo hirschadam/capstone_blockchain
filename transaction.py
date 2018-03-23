@@ -1,18 +1,6 @@
 #!/usr/bin/python3
-#
-# Example Input (Dictionary):
-#   {
-#       "hash": <str>,
-#       "index": <integer>,     # Index of the referenced transactions output
-#       "signature": <str>
-#   }
-#
-# Example Output (Dictionary):
-#   {
-#       "value": <float>,
-#       "pub_key": <str>
-#   }
-#
+
+
 import hashlib
 from ecdsa import VerifyingKey, NIST384p
 
@@ -20,8 +8,8 @@ from ecdsa import VerifyingKey, NIST384p
 
 class Transaction:
     '''
-    @param inputs - array of input dicts
-    @param ouputs - array of output dicts
+    @param inputs - array of inputs
+    @param ouputs - array of outputs
     '''
     def __init__(self, inputs, outputs):
         self.inputs = inputs
@@ -40,6 +28,9 @@ class Transaction:
             value += outputDict['pub_key'] + str(outputDict['val'])
         return value.encode('utf-8')
 
+    '''
+    @param unSpentTransactions - dict{tx_hash -> array of outputs}
+    '''
     def isValid(self, unSpentTransactions):
         totalValIn = 0.0
         totalValOut = 0.0
@@ -47,9 +38,8 @@ class Transaction:
             if inputDict['hash'] == 'BLOCK-REWARD':
                 totalValIn += 5  # Assuming constant reward for now...
             else:
-                # TODO: change to dict of outputs
-                ref_tx = unSpentTransactions[inputDict['hash']]
-                ref_out = ref_tx.outputs[inputDict['index']]
+                ref_outs = unSpentTransactions[inputDict['hash']]
+                ref_out = ref_outs[inputDict['index']]
                 pub_key = ref_out['pub_key']
                 signature = inputDict['signature']
                 vk = VerifyingKey.from_string(pub_key, curve=NIST384p)
