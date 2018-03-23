@@ -14,6 +14,8 @@
 #   }
 #
 import hashlib
+from ecdsa import VerifyingKey, NIST384p
+
 
 
 class Transaction:
@@ -37,3 +39,22 @@ class Transaction:
         for outputDict in self.outputs:
             value += outputDict['pub_key'] + str(outputDict['val'])
         return value.encode('utf-8')
+
+    def isValid(self, unSpentTransactions):
+        totalValIn = 0.0
+        totalValOut = 0.0
+        for inputDict in transaction.inputs:
+            if inputDict['hash'] == 'BLOCK-REWARD':
+                totalValIn += 5  # Assuming constant reward for now...
+            else:
+                ref_tx = unSpentTransactions[inputDict['hash']]
+                ref_out = ref_tx.outputs[inputDict['index']]
+                pub_key = ref_out['pub_key']
+                signature = inputDict['signature']
+                vk = VerifyingKey.from_string(pub_key, curve=NIST384p)
+                if not vk.verify(signature, rf_tx.getDataString):
+                    return False
+                totalValIn += ref_out['value']
+        for outputDict in transaction.outputs:
+            totalValOut += outputDict['value']
+        return totalValIn == totalValOut

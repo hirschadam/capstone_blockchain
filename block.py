@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import time
 import hashlib
-from ecdsa import VerifyingKey, NIST384p
 
 class Block:
     def __init__(self, index, prevHash, timestamp):
@@ -18,25 +17,6 @@ class Block:
             value = transaction.getDataString
         sha = hashlib.sha256(value.encode('utf-8'))
         return str(sha.hexdigest())
-
-    def isValidTransaction(self, transaction, unSpentTransactions):
-        totalValIn = 0.0
-        totalValOut = 0.0
-        for inputDict in transaction.inputs:
-            if inputDict['hash'] == 'BLOCK-REWARD':
-                totalValIn += 5  # Assuming constant reward for now...
-            else:
-                ref_tx = unSpentTransactions[inputDict['hash']]
-                ref_out = ref_tx.outputs[inputDict['index']]
-                pub_key = ref_out['pub_key']
-                signature = inputDict['signature']
-                vk = VerifyingKey.from_string(pub_key, curve=NIST384p)
-                if not vk.verify(signature, rf_tx.getDataString):
-                    return False
-                totalValIn += ref_out['value']
-        for outputDict in transaction.outputs:
-            totalValOut += outputDict['value']
-        return totalValIn == totalValOut
 
 
     def addTransaction(self, transaction, unSpentTransactions):
