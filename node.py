@@ -8,6 +8,7 @@
 from socket import *
 from threading import Thread 
 import sys
+import time
 
 class Node:
 	
@@ -82,7 +83,7 @@ class Server(Thread):
 
 			peer_node = client.recv(self.bufsize)
 			if peer_node:
-				print(peer_node)
+				print peer_node
 			else:
 				continue
 
@@ -104,19 +105,29 @@ class Client(Thread):
 
 	def run(self):
 
-		invalid = True
-		while invalid:
-			try:
-				invalid = False
-				self.socket.connect(self.addr)
-			except:
-				invalid = True
-
+		MAX_CONNECTION_ATTEMPTS = 5
+		SECONDS_BETWEEN_CONNECTION_ATTEMPTS = 3
 		for i in range(len(self.listof_peers)):
-			if self.node_id != self.listof_peers[i][0]:
-				self.socket.send('Hey ' + self.listof_peers[i][1] + " I'm " + self.name + '\n')
+			peer = self.listof_peers[i]
+			if self.node_id != peer[0]:
+				peer_addr = (peer[2],int(peer[4]))
+				attempts = 0
+				while attempts < MAX_CONNECTION_ATTEMPTS:
+					try:
+						print "connecting to", peer_addr
+						self.socket.connect(peer_addr)
+						self.socket.send('Hey ' + peer[1] + " I'm " + self.name + '\n')
+						attempts = MAX_CONNECTION_ATTEMPTS
+						print "Said hey to", peer[1]
+					except:
+						print "Error sending to peer", peer[1] + ".","retry number", attempts
+						attempts += 1
+						if attempts == MAX_CONNECTION_ATTEMPTS:
+							print "Giving up on", peer[1], ":'("
+						time.sleep(SECONDS_BETWEEN_CONNECTION_ATTEMPTS)
+					finally:
+						self.socket.close()
 	
-		self.socket.close()
 def main():
 	
 	print "Building node from", sys.argv[1]
