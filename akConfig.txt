@@ -1,8 +1,8 @@
-node_name=Ryan
-node_id=1
+node_name=Ak
+node_id=2
 node_ip=129.21.133.156
-listeningPort=8484
-sendingPort=8485
+listeningPort=8486
+sendingPort=8487
 genesis_hash=
 version=
 whitelist=

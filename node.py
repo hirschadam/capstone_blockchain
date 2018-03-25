@@ -7,7 +7,7 @@
 
 from socket import *
 from threading import Thread 
-
+import sys
 
 class Node:
 	
@@ -27,6 +27,8 @@ class Node:
 				self.sport = int(line[1].rstrip('\n'))
 			if (line[0] == 'node_ip'):
 				self.node_ip = line[1].rstrip('\n')
+			if (line[0] == 'node_id'):
+				self.node_id = line[1].rstrip('\n')
 			if (line[0] == 'node_name'):
 				self.name = line[1].rstrip('\n')
 			if (line[0] == 'neighbors'):
@@ -52,6 +54,8 @@ class Node:
 
 	def get_name(self):
 		return self.name
+	def get_id(self):
+		return self.node_id
 
 class Server(Thread):
 
@@ -63,6 +67,7 @@ class Server(Thread):
 		self.name = node.get_name()
 		self.bufsize = 1024
 		self.addr = (self.host, self.port)
+		self.node_id = node.get_id()
 
 		self.socket = socket(AF_INET , SOCK_STREAM)
 		self.socket.bind(self.addr)
@@ -93,6 +98,7 @@ class Client(Thread):
 		self.bufsize = 1024
 		self.addr = (self.host, self.port)
 		self.listof_peers = node.peer_info()
+		self.node_id = node.get_id()
 
 		self.socket = socket(AF_INET , SOCK_STREAM)
 
@@ -107,12 +113,14 @@ class Client(Thread):
 				invalid = True
 
 		for i in range(len(self.listof_peers)):
-			self.socket.send('Hey ' + self.listof_peers[i][1] + '\n')
+			if self.node_id != self.listof_peers[i][0]:
+				self.socket.send('Hey ' + self.listof_peers[i][1] + " I'm " + self.name + '\n')
 	
 		self.socket.close()
 def main():
 	
-	filename = 'config.txt'
+	print "Building node from", sys.argv[1]
+	filename = sys.argv[1]
 	node = Node(filename)
 	server = Server(node)
 	client = Client(node)
@@ -124,7 +132,6 @@ def main():
 
 
 main()
-
 
 ## fuctions for peer managment
 #def getInitialNeighbors(config):
