@@ -19,6 +19,8 @@ class Node:
 		self.sport = 0
 		self.node_ip = ''
 		self.name = ''
+		self.peer_list = list()
+
 		f = open(configFileName)
 		for row in f:
 			line = row.split('=')
@@ -96,6 +98,7 @@ class Client(Thread):
 	def __init__(self, node):
 		
 		Thread.__init__(self)
+		self.peer_list = node.peer_list
 		self.port = node.get_sport()
 		self.host = node.get_node_ip()
 		self.name = node.get_name()
@@ -123,8 +126,12 @@ class Client(Thread):
 						self.socket.send('Hey ' + peer[1] + " I'm " + self.name + '\n')
 						attempts = MAX_CONNECTION_ATTEMPTS
 						print "Said hey to", peer[1]
+						peerObject = (peer[0], peer[1], peer[2],peer[3], peer[4], peer[5])
+						print peer[0]
+						#print "List of peers:\n", self.peer_list
+
 					except:
-						print "Error sending to peer", peer[1] + ".","retry number", attempts
+						#print "Error sending to peer", peer[1] + ".","retry number", attempts
 						#print e
 						attempts += 1
 						if attempts == MAX_CONNECTION_ATTEMPTS:
