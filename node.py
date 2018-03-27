@@ -34,6 +34,7 @@ class Node:
 				self.name = line[1].rstrip('\n')
 			if (line[0] == 'neighbors'):
 				self.peers_file = line[1].rstrip('\n')
+		f.close()
 
 	def peer_info(self):
 
@@ -45,6 +46,7 @@ class Node:
 				header = False
 			else:
 				peers.append(neighbor.split(','))
+		f.close()
 		return peers
 
 	def get_sport(self):
