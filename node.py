@@ -75,6 +75,7 @@ class Server(Thread):
 
 	def run(self):
 		
+		print "Starting server"
 		self.socket.listen(5)
 		while True:
 			print 'Waiting for connection..'
@@ -105,6 +106,7 @@ class Client(Thread):
 
 	def run(self):
 
+		print "Starting client"
 		MAX_CONNECTION_ATTEMPTS = 5
 		SECONDS_BETWEEN_CONNECTION_ATTEMPTS = 3
 		for i in range(len(self.listof_peers)):
@@ -121,12 +123,12 @@ class Client(Thread):
 						print "Said hey to", peer[1]
 					except:
 						print "Error sending to peer", peer[1] + ".","retry number", attempts
+						#print e
 						attempts += 1
 						if attempts == MAX_CONNECTION_ATTEMPTS:
 							print "Giving up on", peer[1], ":'("
 						time.sleep(SECONDS_BETWEEN_CONNECTION_ATTEMPTS)
-					finally:
-						self.socket.close()
+				self.socket.close()
 	
 def main():
 	
