@@ -19,7 +19,7 @@ class Node:
 		self.sport = 0
 		self.node_ip = ''
 		self.name = ''
-		self.peer_list = list()
+		self.peer_list = []
 
 		f = open(configFileName)
 		for row in f:
@@ -59,8 +59,22 @@ class Node:
 
 	def get_name(self):
 		return self.name
+
 	def get_id(self):
 		return self.node_id
+	
+	def get_peer_list(self):
+		return self.peer_list
+
+class Peer(object):
+
+	def __init__(self, idx, name, ip_addr, port_send, port_recv):
+
+		self.idx = idx
+		self.name = name
+		self.ip_addr = ip_addr
+		self.port_send = port_send
+		self.port_recv = port_recv
 
 class Server(Thread):
 
@@ -84,7 +98,7 @@ class Server(Thread):
 		while True:
 			print 'Waiting for connection..'
 			client, caddr = self.socket.accept()
-			print 'Connected To',caddr
+			print 'Connected To', caddr
 
 			peer_node = client.recv(self.bufsize)
 			if peer_node:
@@ -98,7 +112,7 @@ class Client(Thread):
 	def __init__(self, node):
 		
 		Thread.__init__(self)
-		self.peer_list = node.peer_list
+		self.peer_list = node.get_peer_list()
 		self.port = node.get_sport()
 		self.host = node.get_node_ip()
 		self.name = node.get_name()
@@ -126,13 +140,12 @@ class Client(Thread):
 						self.socket.send('Hey ' + peer[1] + " I'm " + self.name + '\n')
 						attempts = MAX_CONNECTION_ATTEMPTS
 						print "Said hey to", peer[1]
-						peerObject = (peer[0], peer[1], peer[2],peer[3], peer[4], peer[5])
-						print peer[0]
-						#print "List of peers:\n", self.peer_list
+						peer_object = Peer(peer[0], peer[1], peer[2], peer[3], peer[4])
+						self.peer_list.append(peer_object)
+						print("List of peers: {}\n".format(self.peer_list[0].ip_addr))
 
 					except:
-						#print "Error sending to peer", peer[1] + ".","retry number", attempts
-						#print e
+						print "Error sending to peer", peer[1] + ".","retry number", attempts
 						attempts += 1
 						if attempts == MAX_CONNECTION_ATTEMPTS:
 							print "Giving up on", peer[1], ":'("
