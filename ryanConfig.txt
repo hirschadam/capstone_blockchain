@@ -1,6 +1,6 @@
 node_name=Ryan
 node_id=1
-node_ip=192.168.1.3
+node_ip=129.21.132.59
 listeningPort=8484
 sendingPort=8485
 genesis_hash=

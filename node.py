@@ -1,14 +1,11 @@
 # Planning
-# 	1 set up node listening on a socket
-#		1.1 setup config
-#			1.1.1 list of neighbors
-#			1.1.2 default port
-#	2 transmit data from one node to another
 
 from socket import *
 from threading import Thread 
 import sys
 import time
+import select
+import pickle
 
 class Node:
 	
@@ -66,6 +63,19 @@ class Node:
 	def get_peer_list(self):
 		return self.peer_list
 
+	def sendData(self, data, recv):
+		print "sending", data, "to", recv.name
+		s = socket(AF_INET, SOCK_STREAM)
+		s.connect((recv.ip_addr, int(recv.port_recv)))
+		s.send(pickle.dumps(data))
+
+	def getNeihbors(self):
+		peers = self.get_peer_list()
+		newPeers = {}
+		print "requesting neighbors from", len(peers), "peer(s)"
+		for peer in peers:
+			self.sendData(1,peer)
+
 class Peer(object):
 
 	def __init__(self, idx, name, ip_addr, port_send, port_recv):
@@ -100,9 +110,10 @@ class Server(Thread):
 			client, caddr = self.socket.accept()
 			print 'Connected To', caddr
 
-			peer_node = client.recv(self.bufsize)
-			if peer_node:
-				print peer_node
+			serializedData = client.recv(self.bufsize)
+			#`data = pickle.loads(serializedData)
+			if serializedData:
+				print serializedData
 			else:
 				continue
 
@@ -142,7 +153,7 @@ class Client(Thread):
 						print "Said hey to", peer[1]
 						peer_object = Peer(peer[0], peer[1], peer[2], peer[3], peer[4])
 						self.peer_list.append(peer_object)
-						print("List of peers: {}\n".format(self.peer_list[0].ip_addr))
+						#print("List of peers: {}\n".format(self.peer_list[0].ip_addr))
 
 					except:
 						print "Error sending to peer", peer[1] + ".","retry number", attempts
@@ -163,6 +174,10 @@ def main():
 	server.start()
 	client.start()
 
+	print "Attempting to connect to initial nodes in peers.txt"
+	time.sleep(5)
+	node.getNeihbors()
+
 	server.join()
 
 
@@ -170,7 +185,6 @@ main()
 
 ## fuctions for peer managment
 #def getInitialNeighbors(config):
-#def listNeighbors():
 #def addNeighbor(nodeId, name, ip_addr, port_send, port_recv):
 #def blacklistNeighbor(nodeId):
 ## fuctions for sending and reciving transactions and blocks
