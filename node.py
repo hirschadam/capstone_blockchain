@@ -12,9 +12,9 @@ class Node:
 	def __init__(self, configFileName):
 		
 		self.peers_file = ''
-		self.lport = 0
+		self.port_recv = 0
 		self.sport = 0
-		self.node_ip = ''
+		self.ip_addr = ''
 		self.name = ''
 		self.peer_list = []
 
@@ -22,11 +22,11 @@ class Node:
 		for row in f:
 			line = row.split('=')
 			if (line[0] == 'listeningPort'):
-				self.lport = int(line[1].rstrip('\n'))
+				self.port_recv = int(line[1].rstrip('\n'))
 			if (line[0] == 'sendingPort'):
 				self.sport = int(line[1].rstrip('\n'))
-			if (line[0] == 'node_ip'):
-				self.node_ip = line[1].rstrip('\n')
+			if (line[0] == 'ip_addr'):
+				self.ip_addr = line[1].rstrip('\n')
 			if (line[0] == 'node_id'):
 				self.node_id = line[1].rstrip('\n')
 			if (line[0] == 'node_name'):
@@ -51,8 +51,8 @@ class Node:
 	def get_sport(self):
 		return self.sport
 
-	def get_node_ip(self):
-		return self.node_ip
+	def get_ip_addr(self):
+		return self.ip_addr
 
 	def get_name(self):
 		return self.name
@@ -64,7 +64,10 @@ class Node:
 		return self.peer_list
 
 	def sendData(self, data, recv):
-		print "sending", data, "to", recv.name
+		"""
+		:param data: compsed of messageType and payload
+		:param recv: node that recives the data
+		"""
 		s = socket(AF_INET, SOCK_STREAM)
 		s.connect((recv.ip_addr, int(recv.port_recv)))
 		s.send(pickle.dumps(data))
@@ -73,8 +76,9 @@ class Node:
 		peers = self.get_peer_list()
 		newPeers = {}
 		print "requesting neighbors from", len(peers), "peer(s)"
+		# Send neighbor request and node to reply to every peer currently in peer list
 		for peer in peers:
-			self.sendData((1,peers),peer)
+			self.sendData((1,self),peer)
 
 class Peer(object):
 
@@ -87,16 +91,27 @@ class Peer(object):
 		self.port_recv = port_recv
 
 class Server(Thread):
+	"""
+		Recives messages from other nodes and acts accordingly
+		messageType specifies what kind of data is contained in the payload
+			1	Neighbor request
+			2	Neighbor reply
+			3	Transaction
+			4	Block
+			5	Blockchain request
+			6	Blockchain reply
+	"""
 
 	def __init__(self, node):
 		
 		Thread.__init__(self)
-		self.port = node.get_sport()
-		self.host = node.get_node_ip()
+		self.port = node.port_recv
+		self.host = node.get_ip_addr()
 		self.name = node.get_name()
 		self.bufsize = 1024
 		self.addr = (self.host, self.port)
 		self.node_id = node.get_id()
+		self.node = node
 
 		self.socket = socket(AF_INET , SOCK_STREAM)
 		self.socket.bind(self.addr)
@@ -113,7 +128,14 @@ class Server(Thread):
 			serializedData = client.recv(self.bufsize)
 			data = pickle.loads(serializedData)
 			if data:
-				print data
+				print "Getting data",data
+				messageType, payload = data
+				if messageType == 1:
+					self.node.sendData((2, self.node.peer_list), payload)
+				if messageType == 2:
+					newPeers = set(self.node.peer_list)
+					newPeers.update(payload)
+					self.node.peer_list = list(newPeers)
 			else:
 				continue
 
@@ -125,7 +147,7 @@ class Client(Thread):
 		Thread.__init__(self)
 		self.peer_list = node.get_peer_list()
 		self.port = node.get_sport()
-		self.host = node.get_node_ip()
+		self.host = node.get_ip_addr()
 		self.name = node.get_name()
 		self.bufsize = 1024
 		self.addr = (self.host, self.port)
@@ -137,7 +159,7 @@ class Client(Thread):
 	def run(self):
 
 		print "Starting client"
-		MAX_CONNECTION_ATTEMPTS = 5
+		MAX_CONNECTION_ATTEMPTS = 3
 		SECONDS_BETWEEN_CONNECTION_ATTEMPTS = 3
 		for i in range(len(self.listof_peers)):
 			peer = self.listof_peers[i]
@@ -148,10 +170,11 @@ class Client(Thread):
 					try:
 						print "connecting to", peer_addr
 						self.socket.connect(peer_addr)
-						self.socket.send(pickle.dumps('Hey ' + peer[1] + " I'm " + self.name + '\n'))
+						self.socket.send(pickle.dumps((0,'Hey ' + peer[1] + " I'm " + self.name + '\n')))
 						attempts = MAX_CONNECTION_ATTEMPTS
-						print "Said hey to", peer[1]
+						print "Said hey to", peer[1], peer[2], peer[3], peer[4]
 						peer_object = Peer(peer[0], peer[1], peer[2], peer[3], peer[4])
+						print peer_object.port_send, peer_object.port_recv
 						self.peer_list.append(peer_object)
 
 					except:
