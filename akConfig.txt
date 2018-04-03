@@ -1,6 +1,6 @@
 node_name=Ak
 node_id=2
-node_ip=129.21.132.59
+node_ip=129.21.132.204
 listeningPort=8486
 sendingPort=8487
 genesis_hash=

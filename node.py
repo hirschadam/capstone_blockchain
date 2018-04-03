@@ -74,7 +74,7 @@ class Node:
 		newPeers = {}
 		print "requesting neighbors from", len(peers), "peer(s)"
 		for peer in peers:
-			self.sendData(1,peer)
+			self.sendData((1,peers),peer)
 
 class Peer(object):
 
@@ -111,9 +111,9 @@ class Server(Thread):
 			print 'Connected To', caddr
 
 			serializedData = client.recv(self.bufsize)
-			#`data = pickle.loads(serializedData)
-			if serializedData:
-				print serializedData
+			data = pickle.loads(serializedData)
+			if data:
+				print data
 			else:
 				continue
 
@@ -148,12 +148,11 @@ class Client(Thread):
 					try:
 						print "connecting to", peer_addr
 						self.socket.connect(peer_addr)
-						self.socket.send('Hey ' + peer[1] + " I'm " + self.name + '\n')
+						self.socket.send(pickle.dumps('Hey ' + peer[1] + " I'm " + self.name + '\n'))
 						attempts = MAX_CONNECTION_ATTEMPTS
 						print "Said hey to", peer[1]
 						peer_object = Peer(peer[0], peer[1], peer[2], peer[3], peer[4])
 						self.peer_list.append(peer_object)
-						#print("List of peers: {}\n".format(self.peer_list[0].ip_addr))
 
 					except:
 						print "Error sending to peer", peer[1] + ".","retry number", attempts
