@@ -25,7 +25,7 @@ class Node:
 				self.port_recv = int(line[1].rstrip('\n'))
 			if (line[0] == 'sendingPort'):
 				self.sport = int(line[1].rstrip('\n'))
-			if (line[0] == 'ip_addr'):
+			if (line[0] == 'node_ip'):
 				self.ip_addr = line[1].rstrip('\n')
 			if (line[0] == 'node_id'):
 				self.node_id = line[1].rstrip('\n')
@@ -68,6 +68,7 @@ class Node:
 		:param data: compsed of messageType and payload
 		:param recv: node that recives the data
 		"""
+		print "sending data:", data, "To:", recv.name,"IP:", recv.ip_addr, "Port:", recv.port_recv
 		s = socket(AF_INET, SOCK_STREAM)
 		s.connect((recv.ip_addr, int(recv.port_recv)))
 		s.send(pickle.dumps(data))
@@ -174,7 +175,6 @@ class Client(Thread):
 						attempts = MAX_CONNECTION_ATTEMPTS
 						print "Said hey to", peer[1], peer[2], peer[3], peer[4]
 						peer_object = Peer(peer[0], peer[1], peer[2], peer[3], peer[4])
-						print peer_object.port_send, peer_object.port_recv
 						self.peer_list.append(peer_object)
 
 					except:
@@ -190,6 +190,7 @@ def main():
 	print "Building node from", sys.argv[1]
 	filename = sys.argv[1]
 	node = Node(filename)
+	print "NODE IP:", node.ip_addr
 	server = Server(node)
 	client = Client(node)
 
