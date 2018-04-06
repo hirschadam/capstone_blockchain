@@ -7,20 +7,33 @@ from ecdsa import VerifyingKey, NIST384p
 
 
 class Transaction:
-    '''
-    @param inputs - array of inputs
-    @param ouputs - array of outputs
-    '''
+
     def __init__(self, inputs, outputs):
+        """
+        Constructor for Transaction
+        
+        @param inputs - array of inputs
+        @param ouputs - array of outputs
+        """
         self.inputs = inputs
         self.outputs = outputs
         self.hash = self.calculateHash()
 
     def calculateHash(self):
+        """
+        Calculates Hash for Transaction
+        
+        @return Digest - The Digest of the Transaction String
+        """
         sha = hashlib.sha256(self.getDataString())
         return str(sha.hexdigest())
 
     def getDataString(self):
+        """
+        Calculates Hash for Transaction
+        
+        @return String - The String Representation of the Transaction
+        """
         value = ""
         for inputDict in self.inputs:
             value += inputDict['hash'] + str(inputDict['index']) + str(inputDict['signature'])
@@ -28,10 +41,14 @@ class Transaction:
             value += outputDict['pub_key'] + str(outputDict['val'])
         return value.encode('utf-8')
 
-    '''
-    @param unSpentTransactions - dict{tx_hash -> array of outputs}
-    '''
+
     def isValid(self, unSpentTransactions):
+        """
+        Checks if Transaction is Valid
+        
+        @param unSpentTransactions - dict{tx_hash -> array of outputs}
+        @return If Transaction is valid -> True, False otherwise
+        """
         totalValIn = 0.0
         totalValOut = 0.0
         for inputDict in transaction.inputs:
