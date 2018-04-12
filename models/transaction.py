@@ -34,10 +34,10 @@ class Transaction:
         @return String - The String Representation of the Transaction
         """
         value = ""
-        for inputDict in self.inputs:
-            value += inputDict['hash'] + str(inputDict['index']) + str(inputDict['signature'])
-        for outputDict in self.outputs:
-            value += outputDict['pub_key'] + str(outputDict['val'])
+        for input in self.inputs:
+            value += input.hash + str(input.index) + str(input.signature)
+        for output in self.outputs:
+            value += str(output.pub_key) + str(output.value)
         return value.encode('utf-8')
 
 
@@ -50,18 +50,28 @@ class Transaction:
         """
         totalValIn = 0.0
         totalValOut = 0.0
-        for inputDict in transaction.inputs:
-            if inputDict['hash'] == 'BLOCK-REWARD':
+        for input in transaction.inputs:
+            if input.hash == 'BLOCK-REWARD':
                 totalValIn += 5  # Assuming constant reward for now...
             else:
-                ref_outs = unSpentTransactions[inputDict['hash']]
-                ref_out = ref_outs[inputDict['index']]
-                pub_key = ref_out['pub_key']
-                signature = inputDict['signature']
+                ref_outs = unSpentTransactions[input.hash]
+                ref_out = ref_outs[input.index]
+                pub_key = ref_out.pub_key
+                signature = inputDict.signature
                 vk = VerifyingKey.from_string(pub_key, curve=NIST384p)
                 if not vk.verify(signature, rf_tx.getDataString):
                     return False
-                totalValIn += ref_out['value']
+                totalValIn += ref_out.value
         for outputDict in transaction.outputs:
-            totalValOut += outputDict['value']
+            totalValOut += output.value
         return totalValIn == totalValOut
+
+    def __str__(self):
+        string = "Transaction(\nHash:{}\nInputs:[\n".format(self.hash)
+        for input in self.inputs:
+            string += input.__str__() + ",\n"
+        string += "]\nOutputs:[\n"
+        for output in self.outputs:
+            string += output.__str__() + ",\n"
+        string += "]\n)"
+        return string

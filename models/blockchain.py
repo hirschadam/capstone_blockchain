@@ -9,8 +9,9 @@ class Blockchain:
         """
         self.chain = {}
         self.genesisBlock = Block(0, 'kek', 1518809761.5113006)
-        self.chain[genesisBlock.currHash] = self.genesisBlock
-        self.tailBlockHash = genesisBlock.currHash
+        self.chain[self.genesisBlock.currHash] = self.genesisBlock
+        self.tailBlockHash = self.genesisBlock.currHash
+
 
     def addBlock(self, block):
         """
@@ -46,7 +47,8 @@ class Blockchain:
 
         @return Boolean - True if block is valid, False otherwise
         """
-        prevBlock = self.getBlock(self.block.prevHash)
+
+        prevBlock = self.getBlock(self.tailBlockHash)
         if prevBlock.index+1 != block.index:
             print('Indices Do Not Match Up')
             return False
