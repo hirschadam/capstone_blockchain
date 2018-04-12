@@ -1,0 +1,6 @@
+node_name=node4
+node_id=4
+node_ip=129.21.105.17
+listeningPort=8491
+sendingPort=8490
+neighbors=peers.txt
