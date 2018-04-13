@@ -87,7 +87,7 @@ class Node:
 	def sendBlock(self):
 		for peer in self.get_peer_list():
 			self.sendData((4, self.currBlock), peer)
-		self.blockChain.addBlock(currBlock)
+		self.blockChain.addBlock(self.currBlock)
 		self.currBlock = Block(self.currBlock.index, self.currBlock.currHash, datetime.datetime.utcnow().__str__())
 
 	def sendData(self, data, recv):
