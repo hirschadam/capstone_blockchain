@@ -167,8 +167,8 @@ class Server(Thread):
 				if messageType == 4:
 					if self.blockChain.isValidBlock(payload):
 						for peer in self.node.get_peer_list():
-							self.sendData((4, paylod), peer)
-							self.blockChain.addBlock(paylod)
+							self.sendData((4, payload), peer)
+							self.blockChain.addBlock(payload)
 						self.currBlock = Block(payload.index, payload.currHash, datetime.datetime.utcnow().__str__())
 
 
