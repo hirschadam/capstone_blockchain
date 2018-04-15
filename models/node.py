@@ -146,37 +146,35 @@ class Server(Thread):
 	def run(self):
 		self.socket.listen(5)           
 		while True:
-            try:
-    			print('Waiting for connection..')
-	    		client, caddr = self.socket.accept()
-		    	print('Connected To', caddr)
+            print('Waiting for connection..')
+	    	client, caddr = self.socket.accept()
+		    print('Connected To', caddr)
 
-			    serializedData = client.recv(self.bufsize)
-			    data = pickle.loads(serializedData)
-			    if data:
-				    messageType, payload = data
-				    if messageType == 1:
-					    self.node.sendData((2, self.node.peer_list), payload)
-				    if messageType == 2:
-					    newPeers = set(self.node.peer_list)
-					    newPeers.update(payload)
-					    self.node.peer_list = list(newPeers)
-				    if messageType == 3:
-					    self.node.unspentTransactions[payload.hash] = payload
-					    self.node.currBlock.addTransaction(payload, self.node.unspentTransactions)
-				    if messageType == 4:
-					    if self.blockChain.isValidBlock(payload):
-						    for peer in self.node.get_peer_list():
-							    self.sendData((4, payload), peer)
-							    self.blockChain.addBlock(payload)
-						    self.currBlock = Block(payload.index, payload.currHash, datetime.datetime.utcnow().__str__())
+			serializedData = client.recv(self.bufsize)
+			data = pickle.loads(serializedData)
+			if data:
+			    messageType, payload = data
+			    if messageType == 1:
+				    self.node.sendData((2, self.node.peer_list), payload)
+			    if messageType == 2:
+				    newPeers = set(self.node.peer_list)
+				    newPeers.update(payload)
+				    self.node.peer_list = list(newPeers)
+			    if messageType == 3:
+				    self.node.unspentTransactions[payload.hash] = payload
+				    self.node.currBlock.addTransaction(payload, self.node.unspentTransactions)
+			    if messageType == 4:
+				    if self.blockChain.isValidBlock(payload):
+					    for peer in self.node.get_peer_list():
+						    self.sendData((4, payload), peer)
+						    self.blockChain.addBlock(payload)
+					    self.currBlock = Block(payload.index, payload.currHash, datetime.datetime.utcnow().__str__())
 
-                    client.close()
-			    else:
-                    client.close()
-				    continue
-            except Exception as e:
-                pass
+                client.close()
+			else:
+                client.close()
+			    continue
+            
 
 class Client(Thread):
 
