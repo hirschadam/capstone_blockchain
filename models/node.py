@@ -144,9 +144,7 @@ class Server(Thread):
 		self.socket.bind(self.addr)
 
 	def run(self):
-
-		self.socket.listen(5)
-                
+		self.socket.listen(5)           
 		while True:
             try:
     			print('Waiting for connection..')
@@ -177,7 +175,7 @@ class Server(Thread):
 			    else:
                     client.close()
 				    continue
-            catch Exception as e:
+            except Exception as e:
                 pass
 
 class Client(Thread):
