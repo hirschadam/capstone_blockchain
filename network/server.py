@@ -1,7 +1,9 @@
 from .node import Node
 from models.block import Block
 from models.blockchain import Blockchain
+from socket import *
 import random
+import pickle
 import time
 from threading import Thread
 
