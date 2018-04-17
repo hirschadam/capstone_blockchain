@@ -31,33 +31,33 @@ class Server(Thread):
 	def run(self):
 		self.socket.listen(5)           
 		while True:
-            print('Waiting for connection..')
+        	print('Waiting for connection..')
 	    	client, caddr = self.socket.accept()
-		    print('Connected To', caddr)
+			print('Connected To', caddr)
 
 			serializedData = client.recv(self.bufsize)
 			data = pickle.loads(serializedData)
 			if data:
-			    messageType, payload = data
-			    if messageType == REQUEST_NEIGHBORS:
-				    self.node.sendData((REPLY_NEIGHBORS, self.node.peer_list), payload)
-			    if messageType == REPLY_NEIGHBORS:
-				    newPeers = set(self.node.peer_list)
-				    newPeers.update(payload)
-				    self.node.peer_list = list(newPeers)
-			    if messageType == TRANSACTION:
-				    self.node.unspentTransactions[payload.hash] = payload
-				    self.node.currBlock.addTransaction(payload, self.node.unspentTransactions)
-			    if messageType == BLOCK:
-				    if self.blockChain.isValidBlock(payload):
-					    for peer in self.node.get_peer_list():
-						    self.sendData((4, payload), peer)
-						    self.blockChain.addBlock(payload)
-					    self.currBlock = Block(payload.index, payload.currHash, datetime.datetime.utcnow().__str__())
+				messageType, payload = data
+				if messageType == REQUEST_NEIGHBORS:
+					self.node.sendData((REPLY_NEIGHBORS, self.node.peer_list), payload)
+				if messageType == REPLY_NEIGHBORS:
+					newPeers = set(self.node.peer_list)
+					newPeers.update(payload)
+					self.node.peer_list = list(newPeers)
+				if messageType == TRANSACTION:
+					self.node.unspentTransactions[payload.hash] = payload
+					self.node.currBlock.addTransaction(payload, self.node.unspentTransactions)
+				if messageType == BLOCK:
+					if self.blockChain.isValidBlock(payload):
+						for peer in self.node.get_peer_list():
+							self.sendData((4, payload), peer)
+							self.blockChain.addBlock(payload)
+						self.currBlock = Block(payload.index, payload.currHash, datetime.datetime.utcnow().__str__())
 
-                client.close()
+					client.close()
 			else:
-                client.close()
-			    continue
+				client.close()
+				continue
 
 
