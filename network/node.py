@@ -1,6 +1,6 @@
 # Planning
-from .block import Block
-from .blockchain import Blockchain
+from models.block import Block
+from models.blockchain import Blockchain
 
 from ecdsa import SigningKey, NIST384p
 from socket import *

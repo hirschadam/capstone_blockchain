@@ -1,4 +1,6 @@
 from .node import Node
+from models.block import Block
+from models.blockchain import Blockchain
 import random
 import time
 
