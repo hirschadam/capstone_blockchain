@@ -3,6 +3,7 @@ from models.block import Block
 from models.blockchain import Blockchain
 import random
 import time
+from threading import Thread
 
 # Message types for communication between nodes
 REQUEST_NEIGHBORS = 1
@@ -31,8 +32,8 @@ class Server(Thread):
 	def run(self):
 		self.socket.listen(5)           
 		while True:
-        	print('Waiting for connection..')
-	    	client, caddr = self.socket.accept()
+			print('Waiting for connection..')
+			client, caddr = self.socket.accept()
 			print('Connected To', caddr)
 
 			serializedData = client.recv(self.bufsize)
