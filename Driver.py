@@ -1,18 +1,16 @@
 from models import Input, Output, Transaction
-from network import Node, Server, Client
+from network import Node, Server
 import threading
 import time
 import random
 
-def runNode(node):
+def runNode(server):
 	server = Server(node)
-	client = Client(node)
 
 	server.start()
-	client.start()
 
 	time.sleep(5)
-	node.getNeihbors()
+	server.node.getNeihbors()
 
 	server.join()
 
@@ -28,21 +26,28 @@ def createRewardTransaction(node):
 
 
 if __name__ == '__main__':
-    listOfConfigs = ['node1.txt', 'node2.txt', 'node3.txt', 'node4.txt']
-    nodes = []
-    threads = []
-    for conf in listOfConfigs:
-        node = Node(conf)
-        nodes.append(node)
-        t1 = threading.Thread(target=runNode, args=(node,))
-        t1.start()
-        threads.append(t1)
+	listOfConfigs = ['node1.txt', 'node2.txt', 'node3.txt', 'node4.txt']
+	servers = []
+	threads = []
+	for conf in listOfConfigs:
+		node = Node(conf)
+		server = Server(node)
+		servers.append(server)
+		t = threading.Thread(target=runNode, args=(node,))
+		t.start()
+		threads.append(t)
 
-    for i in range(50):
-        time.sleep(5)
-        randomIndex = random.randint(0, len(threads)-1)
-        createRewardTransaction(nodes[randomIndex])
+	for i in range(50):
+		time.sleep(5)
+		randomIndex = random.randint(0, len(threads)-1)
+		createRewardTransaction(servers[randomIndex].node)
+	randomIndex = random.randint(0, len(threads)-1)
+	servers[randomIndex].node.sendBlock()
 
 
-    for t1 in threads:
-        t1.join()
+
+	#TODO: Final lifecycle
+
+
+	for t in threads:
+		t.join()

@@ -1,6 +1,6 @@
 node_name=node1
 node_id=1
-node_ip=129.21.105.17
+node_ip=129.21.107.41
 listeningPort=8484
 sendingPort=8485
 neighbors=peers.txt

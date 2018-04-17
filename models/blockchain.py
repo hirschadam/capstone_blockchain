@@ -72,3 +72,4 @@ class Blockchain:
                 return False
             currBlock = self.getBlock(currBlock.prevHash)
         return True
+        
