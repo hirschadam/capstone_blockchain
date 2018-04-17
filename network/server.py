@@ -34,7 +34,7 @@ class Server(Thread):
 	def run(self):
 		self.socket.listen(5)           
 		while True:
-			print('Waiting for connection..')
+			print("Node " + self.node_id +': waiting for connection..')
 			client, caddr = self.socket.accept()
 			print('Connected To', caddr)
 
