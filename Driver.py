@@ -1,4 +1,5 @@
-from models import Input, Output, Transaction, Node, Server, Client
+from models import Input, Output, Transaction
+from network import Node, Server, Client
 import threading
 import time
 import random
