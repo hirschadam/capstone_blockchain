@@ -28,7 +28,7 @@ if __name__ == '__main__':
 		randomIndex = random.randint(0, len(servers)-1)
 		createRewardTransaction(servers[randomIndex].node)
 		randomIndex = random.randint(0, len(servers)-1)
-		servers[randomIndex].node.sendBlock()
+		servers[randomIndex].node.sendBlock();time.sleep(5)
 		print("=====================================================")
 		for server in servers:
 			node = server.node

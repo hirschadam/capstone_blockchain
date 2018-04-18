@@ -21,9 +21,9 @@ class Node:
 		self.sport = 0
 		self.ip_addr = ''
 		self.name = ''
-		self.unspentTransactions = {}
+		self.unSpentTransactions = {}
 		self.blockChain = Blockchain()
-		index = self.blockChain.getBlock(self.blockChain.tailBlockHash).index
+		index = self.blockChain.getBlock(self.blockChain.tailBlockHash).index+1
 		prevHash = self.blockChain.tailBlockHash
 		timestamp = datetime.datetime.utcnow().__str__()
 		self.currBlock = Block(index, prevHash, timestamp)
@@ -36,8 +36,6 @@ class Node:
 			line = row.split('=')
 			if (line[0] == 'listeningPort'):
 				self.port_recv = int(line[1].rstrip('\n'))
-			if (line[0] == 'sendingPort'):
-				self.sport = int(line[1].rstrip('\n'))
 			if (line[0] == 'node_ip'):
 				self.ip_addr = line[1].rstrip('\n')
 			if (line[0] == 'node_id'):
@@ -61,13 +59,10 @@ class Node:
 			else:
 				v = neighbor.split(',')
 				if v[0] != self.node_id:
-					peer = Peer(v[0], v[1], v[2], v[3], v[4])
+					peer = Peer(v[0], v[1], v[2], v[3])
 					peers.append(peer)
 		f.close()
 		return peers
-
-	def get_sport(self):
-		return self.sport
 
 	def get_ip_addr(self):
 		return self.ip_addr
@@ -92,15 +87,15 @@ class Node:
 		print("Block {} sent...".format(self.currBlock.currHash))
 		for peer in self.get_peer_list():
 			self.sendData((4, self.currBlock), peer)
-		self.blockChain.addBlock(self.currBlock)
-		self.currBlock = Block(self.currBlock.index, self.currBlock.currHash, datetime.datetime.utcnow().__str__())
+		self.blockChain.addBlock(self.currBlock, self.unSpentTransactions)
+		self.currBlock = Block(self.currBlock.index+1, self.currBlock.currHash, datetime.datetime.utcnow().__str__())
 
 	def sendData(self, data, recv):
 		"""
 		:param data: compsed of messageType and payload
 		:param recv: node that recives the data
 		"""
-		print("sending data:", data, "To:", recv.name,"IP:", recv.ip_addr, "Port:", recv.port_recv,"From:", self.name, "IP:", self.ip_addr, "Port:", self.sport)
+		print("sending data:", data, "To:", recv.name,"IP:", recv.ip_addr, "Port:", recv.port_recv,"From:", self.name, "IP:", self.ip_addr)
 		time.sleep(1)
 		s = socket(AF_INET, SOCK_STREAM)
 		s.connect((recv.ip_addr, int(recv.port_recv)))
@@ -116,12 +111,11 @@ class Node:
 
 class Peer(object):
 
-	def __init__(self, idx, name, ip_addr, port_send, port_recv):
+	def __init__(self, idx, name, ip_addr, port_recv):
 
 		self.idx = idx
 		self.name = name
 		self.ip_addr = ip_addr
-		self.port_send = port_send
 		self.port_recv = port_recv
 
 ## fuctions for peer managment

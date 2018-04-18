@@ -6,6 +6,7 @@ import random
 import pickle
 import time
 from threading import Thread
+import datetime
 
 # Message types for communication between nodes
 REQUEST_NEIGHBORS = 1
@@ -49,14 +50,13 @@ class Server(Thread):
 					newPeers.update(payload)
 					self.node.peer_list = list(newPeers)
 				if messageType == TRANSACTION:
-					self.node.unspentTransactions[payload.hash] = payload
-					self.node.currBlock.addTransaction(payload, self.node.unspentTransactions)
+					self.node.unSpentTransactions[payload.hash] = payload
+					self.node.currBlock.addTransaction(payload, self.node.unSpentTransactions)
 				if messageType == BLOCK:
-					if self.node.blockChain.isValidBlock(payload):
+					if self.node.blockChain.isValidBlock(payload, self.node.unSpentTransactions):
+						#TODO: Protect Double Spend here
 						for peer in self.node.get_peer_list():
-							self.sendData((4, payload), peer)
-							self.node.blockChain.addBlock(payload)
-						self.node.currBlock = Block(payload.index, payload.currHash, datetime.datetime.utcnow().__str__())
-					else:
-						print("Nuh uh, that is NOT my Block!")
+							self.node.sendData((4, payload), peer)
+							self.node.blockChain.addBlock(payload, self.node.unSpentTransactions)
+						self.node.currBlock = Block(payload.index+1, payload.currHash, datetime.datetime.utcnow().__str__())
 			client.close()

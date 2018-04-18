@@ -13,7 +13,7 @@ class Blockchain:
         self.tailBlockHash = self.genesisBlock.currHash
 
 
-    def addBlock(self, block):
+    def addBlock(self, block, unSpentTransactions):
         """
         Add Block to Blockchain
 
@@ -21,7 +21,7 @@ class Blockchain:
 
         @return Boolean - True if block was added, False otherwise
         """
-        if self.isValidBlock(block):
+        if self.isValidBlock(block, unSpentTransactions):
             self.chain[block.currHash] = block
             self.tailBlockHash = block.currHash
             return True
@@ -39,7 +39,7 @@ class Blockchain:
             return self.chain[hash]
         return None
 
-    def isValidBlock(self, block):
+    def isValidBlock(self, block, unSpentTransactions):
         """
         Checks if Block is Valid
 
@@ -50,7 +50,7 @@ class Blockchain:
 
         prevBlock = self.getBlock(self.tailBlockHash)
         if prevBlock.index+1 != block.index:
-            print('Indices Do Not Match Up')
+            # print('Indices Do Not Match Up: {} != {} + 1'.format(block.index, prevBlock.index))
             return False
         elif prevBlock.currHash != block.prevHash:
             print("Previous hash does not match")
@@ -58,7 +58,7 @@ class Blockchain:
         elif block.calculateHash() != block.currHash:
             print("Invalid hashpointer")
             return False
-        return block.isValid()
+        return block.isValid(unSpentTransactions)
 
     def isValid(self):
         """
