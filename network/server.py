@@ -35,6 +35,7 @@ class Server(Thread):
 		self.socket.listen(5)
 		print('Node {} is up...'.format(self.node.node_id))
 		while True:
+			print("Node " + self.node_id +': waiting for connection..')
 			client, caddr = self.socket.accept()
 
 			serializedData = client.recv(self.bufsize)
