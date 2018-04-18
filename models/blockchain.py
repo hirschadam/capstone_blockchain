@@ -39,6 +39,22 @@ class Blockchain:
             return self.chain[hash]
         return None
 
+    def getTransaction(self, hash):
+        """
+        Get Transaction from Blockchain
+
+        @param hash - Hash of Transaction to get
+
+        @return Block - The Transaction in question, or None
+        """
+        currBlock = self.getBlock(self.tailBlockHash)
+        while currBlock != self.genesisBlock:
+            for o_hash in currBlock.transactions:
+                if hash == o_hash:
+                    return currBlock.transactions[hash]
+            currBlock = self.getBlock(currBlock.prevHash)
+        return None
+
     def isValidBlock(self, block, unSpentTransactions):
         """
         Checks if Block is Valid
@@ -77,6 +93,9 @@ class Blockchain:
         string = ""
         currBlock = self.getBlock(self.tailBlockHash)
         while currBlock != self.genesisBlock:
-            string += "{} -> ".format(currBlock.currHash)
+            hash_str = currBlock.currHash[:4]
+            hash_str += "..."
+            hash_str += currBlock.currHash[-4:]
+            string += "{} -> ".format(hash_str)
             currBlock = self.getBlock(currBlock.prevHash)
-        return string
+        return string[:-4]

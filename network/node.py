@@ -2,6 +2,8 @@
 from models.block import Block
 from models.blockchain import Blockchain
 
+from .peer import Peer
+
 from ecdsa import SigningKey, NIST384p
 from socket import *
 from threading import Thread
@@ -77,6 +79,7 @@ class Node:
 		return self.peer_list
 
 	def sendTransaction(self, transaction):
+		self.unSpentTransactions[transaction.hash] = transaction
 		for peer in self.get_peer_list():
 			self.sendData((3, transaction), peer)
 
@@ -84,7 +87,7 @@ class Node:
 		return self.priv_key.sign(data)
 
 	def sendBlock(self):
-		print("Block {} sent...".format(self.currBlock.currHash))
+		print("Block {} being sent...".format(self.currBlock.currHash))
 		for peer in self.get_peer_list():
 			self.sendData((4, self.currBlock), peer)
 		self.blockChain.addBlock(self.currBlock, self.unSpentTransactions)
@@ -101,33 +104,3 @@ class Node:
 		s.connect((recv.ip_addr, int(recv.port_recv)))
 		s.send(pickle.dumps(data))
 		s.close()
-
-	def getNeihbors(self):
-		peers = self.get_peer_list()
-		newPeers = {}
-		# Send neighbor request and node to reply to every peer currently in peer list
-		for peer in peers:
-			self.sendData((1,self),peer)
-
-class Peer(object):
-
-	def __init__(self, idx, name, ip_addr, port_recv):
-
-		self.idx = idx
-		self.name = name
-		self.ip_addr = ip_addr
-		self.port_recv = port_recv
-
-## fuctions for peer managment
-#def getInitialNeighbors(config):
-#def addNeighbor(nodeId, name, ip_addr, port_send, port_recv):
-#def blacklistNeighbor(nodeId):
-## fuctions for sending and reciving transactions and blocks
-#def sendTransaction():
-#def verifyTransaction():
-#def sendBlock():
-#def verifyBlock():
-##functions for managing the blockchain
-#def listBlocks():
-#def addToBlockchain():
-#def getNewestBlock():

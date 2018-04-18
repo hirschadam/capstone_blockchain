@@ -36,7 +36,6 @@ class Server(Thread):
 		self.socket.listen(5)
 		print('Node {} is up...'.format(self.node.node_id))
 		while True:
-			print("Node " + self.node_id +': waiting for connection..')
 			client, caddr = self.socket.accept()
 
 			serializedData = client.recv(self.bufsize)
@@ -50,13 +49,24 @@ class Server(Thread):
 					newPeers.update(payload)
 					self.node.peer_list = list(newPeers)
 				if messageType == TRANSACTION:
-					self.node.unSpentTransactions[payload.hash] = payload
-					self.node.currBlock.addTransaction(payload, self.node.unSpentTransactions)
+					if payload.hash not in self.node.unSpentTransactions:
+						if payload.isValid(self.node.unSpentTransactions):
+							self.node.unSpentTransactions[payload.hash] = payload
+							self.node.currBlock.addTransaction(payload, self.node.unSpentTransactions)
+							for peer in self.node.get_peer_list():
+								self.node.sendData((TRANSACTION, payload), peer)
 				if messageType == BLOCK:
 					if self.node.blockChain.isValidBlock(payload, self.node.unSpentTransactions):
-						#TODO: Protect Double Spend here
-						for peer in self.node.get_peer_list():
-							self.node.sendData((4, payload), peer)
-							self.node.blockChain.addBlock(payload, self.node.unSpentTransactions)
+						for hash in payload.transactions:
+							inputs = payload.transactions[hash].inputs
+							for input in inputs:
+								if input.hash != 'BLOCK-REWARD':
+									transaction = self.node.unSpentTransactions[input.hash]
+									transaction.outputs[input.index] = None
+									self.node.unSpentTransactions[input.hash] = transaction
+
+						self.node.blockChain.addBlock(payload, self.node.unSpentTransactions)
 						self.node.currBlock = Block(payload.index+1, payload.currHash, datetime.datetime.utcnow().__str__())
+						for peer in self.node.get_peer_list():
+							self.node.sendData((BLOCK, payload), peer)
 			client.close()

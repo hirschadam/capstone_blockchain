@@ -2,6 +2,7 @@
 
 import hashlib
 from ecdsa import VerifyingKey, NIST384p
+import datetime
 
 
 
@@ -16,6 +17,7 @@ class Transaction:
         """
         self.inputs = inputs
         self.outputs = outputs
+        self.timestamp = datetime.datetime.utcnow().__str__()
         self.hash = self.calculateHash()
 
     def calculateHash(self):
@@ -38,6 +40,7 @@ class Transaction:
             value += input.hash + str(input.index) + str(input.signature)
         for output in self.outputs:
             value += str(output.pub_key) + str(output.value)
+        value += str(self.timestamp)
         return value.encode('utf-8')
 
 
@@ -56,6 +59,8 @@ class Transaction:
             else:
                 ref_outs = unSpentTransactions[input.hash]
                 ref_out = ref_outs[input.index]
+                if ref_out is None:
+                    continue
                 pub_key = ref_out.pub_key
                 signature = inputDict.signature
                 vk = VerifyingKey.from_string(pub_key, curve=NIST384p)
@@ -75,3 +80,6 @@ class Transaction:
             string += output.__str__() + ",\n"
         string += "]\n)"
         return string
+
+    def __eq__(self, other):
+        return self.calculateHash() == other.calculateHash()
