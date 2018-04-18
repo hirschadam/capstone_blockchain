@@ -32,11 +32,10 @@ class Server(Thread):
 		self.socket.bind(self.addr)
 
 	def run(self):
-		self.socket.listen(5)           
+		self.socket.listen(5)
+		print('Node {} is up...'.format(self.node.node_id))
 		while True:
-			print('Waiting for connection..')
 			client, caddr = self.socket.accept()
-			print('Connected To', caddr)
 
 			serializedData = client.recv(self.bufsize)
 			data = pickle.loads(serializedData)
@@ -52,15 +51,11 @@ class Server(Thread):
 					self.node.unspentTransactions[payload.hash] = payload
 					self.node.currBlock.addTransaction(payload, self.node.unspentTransactions)
 				if messageType == BLOCK:
-					if self.blockChain.isValidBlock(payload):
+					if self.node.blockChain.isValidBlock(payload):
 						for peer in self.node.get_peer_list():
 							self.sendData((4, payload), peer)
-							self.blockChain.addBlock(payload)
-						self.currBlock = Block(payload.index, payload.currHash, datetime.datetime.utcnow().__str__())
-
-					client.close()
-			else:
-				client.close()
-				continue
-
-
+							self.node.blockChain.addBlock(payload)
+						self.node.currBlock = Block(payload.index, payload.currHash, datetime.datetime.utcnow().__str__())
+					else:
+						print("Nuh uh, that is NOT my Block!")
+			client.close()

@@ -72,4 +72,11 @@ class Blockchain:
                 return False
             currBlock = self.getBlock(currBlock.prevHash)
         return True
-        
+
+    def __str__(self):
+        string = ""
+        currBlock = self.getBlock(self.tailBlockHash)
+        while currBlock != self.genesisBlock:
+            string += "{} -> ".format(currBlock.currHash)
+            currBlock = self.getBlock(currBlock.prevHash)
+        return string

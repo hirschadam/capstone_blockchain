@@ -50,7 +50,7 @@ class Transaction:
         """
         totalValIn = 0.0
         totalValOut = 0.0
-        for input in transaction.inputs:
+        for input in self.inputs:
             if input.hash == 'BLOCK-REWARD':
                 totalValIn += 5  # Assuming constant reward for now...
             else:
@@ -62,7 +62,7 @@ class Transaction:
                 if not vk.verify(signature, rf_tx.getDataString):
                     return False
                 totalValIn += ref_out.value
-        for outputDict in transaction.outputs:
+        for output in self.outputs:
             totalValOut += output.value
         return totalValIn == totalValOut
 

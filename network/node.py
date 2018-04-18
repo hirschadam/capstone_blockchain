@@ -21,7 +21,6 @@ class Node:
 		self.sport = 0
 		self.ip_addr = ''
 		self.name = ''
-		self.peer_list = []
 		self.unspentTransactions = {}
 		self.blockChain = Blockchain()
 		index = self.blockChain.getBlock(self.blockChain.tailBlockHash).index
@@ -48,6 +47,8 @@ class Node:
 			if (line[0] == 'neighbors'):
 				self.peers_file = line[1].rstrip('\n')
 		f.close()
+		self.peer_list = self.peer_info()
+
 
 	def peer_info(self):
 
@@ -58,7 +59,10 @@ class Node:
 			if header:
 				header = False
 			else:
-				peers.append(neighbor.split(','))
+				v = neighbor.split(',')
+				if v[0] != self.node_id:
+					peer = Peer(v[0], v[1], v[2], v[3], v[4])
+					peers.append(peer)
 		f.close()
 		return peers
 
@@ -85,6 +89,7 @@ class Node:
 		return self.priv_key.sign(data)
 
 	def sendBlock(self):
+		print("Block {} sent...".format(self.currBlock.currHash))
 		for peer in self.get_peer_list():
 			self.sendData((4, self.currBlock), peer)
 		self.blockChain.addBlock(self.currBlock)
@@ -96,9 +101,11 @@ class Node:
 		:param recv: node that recives the data
 		"""
 		print("sending data:", data, "To:", recv.name,"IP:", recv.ip_addr, "Port:", recv.port_recv,"From:", self.name, "IP:", self.ip_addr, "Port:", self.sport)
+		time.sleep(1)
 		s = socket(AF_INET, SOCK_STREAM)
 		s.connect((recv.ip_addr, int(recv.port_recv)))
 		s.send(pickle.dumps(data))
+		s.close()
 
 	def getNeihbors(self):
 		peers = self.get_peer_list()
