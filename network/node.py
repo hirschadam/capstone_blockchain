@@ -33,7 +33,7 @@ class Node:
 		self.priv_key = SigningKey.generate(curve=NIST384p)
 		self.pub_key = self.priv_key.get_verifying_key()
 
-		f = open(configFileName)
+		f = open('nodes/' + configFileName)
 		for row in f:
 			line = row.split('=')
 			if (line[0] == 'listeningPort'):
@@ -52,7 +52,7 @@ class Node:
 
 	def peer_info(self):
 
-		f = open(self.peers_file)
+		f = open('peers/' + self.peers_file)
 		peers = []
 		header = True
 		for neighbor in f:
