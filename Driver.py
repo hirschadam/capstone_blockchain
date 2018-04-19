@@ -58,7 +58,7 @@ if __name__ == '__main__':
         createRewardTransaction(servers[randomIndex].node)
         randomIndex = random.randint(0, len(servers)-1)
         servers[randomIndex].node.sendBlock()
-        time.sleep(8)
+        time.sleep(12)
         print("Blockchain Summaries\n=====================================================")
         for server in servers:
             node = server.node
