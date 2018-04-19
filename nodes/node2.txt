@@ -1,5 +1,5 @@
 node_name=node2
 node_id=2
-node_ip=129.21.118.168 
+node_ip=129.21.118.168
 listeningPort=8482
 neighbors=peers2.txt
