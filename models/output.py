@@ -1,13 +1,13 @@
 class Output:
-    def __init__(self, value, pub_key):
+    def __init__(self, pub_key, value):
         """
         Constructor for Output
 
-        @param value - Coin of Output
         @param pub_key - Recipient of Coin
+        @param value - Coin of Output
         """
-        self.value = value
         self.pub_key = pub_key
+        self.value = value
 
     def __str__(self):
-        return "Input(\nValue:{}\nPublic Key:{}\n)".format(self.value, self.pub_key)
+        return "Output(\nValue:{}\nPublic Key:{}\n)".format(self.value, str(self.pub_key))

@@ -66,13 +66,10 @@ class Blockchain:
 
         prevBlock = self.getBlock(self.tailBlockHash)
         if prevBlock.index+1 != block.index:
-            # print('Indices Do Not Match Up: {} != {} + 1'.format(block.index, prevBlock.index))
             return False
         elif prevBlock.currHash != block.prevHash:
-            print("Previous hash does not match")
             return False
         elif block.calculateHash() != block.currHash:
-            print("Invalid hashpointer")
             return False
         return block.isValid(unSpentTransactions)
 

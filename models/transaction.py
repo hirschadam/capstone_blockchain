@@ -58,13 +58,13 @@ class Transaction:
                 totalValIn += 5  # Assuming constant reward for now...
             else:
                 ref_outs = unSpentTransactions[input.hash]
-                ref_out = ref_outs[input.index]
+                ref_out = ref_outs.outputs[input.index]
                 if ref_out is None:
                     continue
                 pub_key = ref_out.pub_key
-                signature = inputDict.signature
+                signature = input.signature
                 vk = VerifyingKey.from_string(pub_key, curve=NIST384p)
-                if not vk.verify(signature, rf_tx.getDataString):
+                if not vk.verify(signature, input.hash.encode('utf-8')):
                     return False
                 totalValIn += ref_out.value
         for output in self.outputs:

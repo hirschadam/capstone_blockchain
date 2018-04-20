@@ -24,7 +24,7 @@ class Server(Thread):
 		self.port = node.port_recv
 		self.host = node.get_ip_addr()
 		self.name = node.get_name()
-		self.bufsize = 1024
+		self.bufsize = 4096
 		self.addr = (self.host, self.port)
 		self.node_id = node.get_id()
 		self.node = node

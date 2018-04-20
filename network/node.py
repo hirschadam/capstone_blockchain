@@ -79,6 +79,12 @@ class Node:
 		return self.peer_list
 
 	def sendTransaction(self, transaction):
+		inputs = transaction.inputs
+		for input in inputs:
+			if input.hash != 'BLOCK-REWARD':
+				transaction_i = self.unSpentTransactions[input.hash]
+				transaction_i.outputs[input.index] = None
+				self.unSpentTransactions[input.hash] = transaction_i
 		self.unSpentTransactions[transaction.hash] = transaction
 		for peer in self.get_peer_list():
 			self.sendData((3, transaction), peer)
