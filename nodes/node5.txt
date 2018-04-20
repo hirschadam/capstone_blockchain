@@ -1,0 +1,5 @@
+node_name=node5
+node_id=5
+node_ip=129.21.106.250
+listeningPort=8485
+neighbors=peers5.txt

@@ -28,7 +28,6 @@ class Server(Thread):
 		self.addr = (self.host, self.port)
 		self.node_id = node.get_id()
 		self.node = node
-
 		self.socket = socket(AF_INET , SOCK_STREAM)
 		self.socket.bind(self.addr)
 

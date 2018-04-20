@@ -1,0 +1,5 @@
+node_name=node7
+node_id=7
+node_ip=129.21.106.250
+listeningPort=8487
+neighbors=peers7.txt

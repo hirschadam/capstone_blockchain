@@ -3,6 +3,7 @@ from network import Node, Server
 import time
 import random
 import copy
+import sys
 
 def makeTransaction(node_send, node_rec, val):
     get_val = val
@@ -82,7 +83,8 @@ def printBalances(servers):
     print("=====================================================")
 
 if __name__ == '__main__':
-    listOfConfigs = ['node1.txt', 'node2.txt', 'node3.txt', 'node4.txt']
+    listOfConfigs = ['node1.txt', 'node2.txt', 'node3.txt', 'node4.txt', \
+		'node5.txt', 'node6.txt', 'node7.txt', 'node8.txt', 'node9.txt', 'node10.txt']
     servers = []
     for conf in listOfConfigs:
         node = Node(conf)
@@ -96,7 +98,7 @@ if __name__ == '__main__':
         createRewardTransaction(servers[randomIndex].node)
         randomIndex = random.randint(0, len(servers)-1)
         servers[randomIndex].node.sendBlock()
-        time.sleep(8)
+        time.sleep(12)
         print("Blockchain Summaries\n=====================================================")
         for server in servers:
             node = server.node
