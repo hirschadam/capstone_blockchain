@@ -18,6 +18,11 @@ class Node:
 
 	def __init__(self, configFileName):
 
+		"""
+		Constructor for Node
+		@param configFileName - Configuration file for the node
+
+		"""
 		self.peers_file = ''
 		self.port_recv = 0
 		self.sport = 0
@@ -52,6 +57,10 @@ class Node:
 
 	def peer_info(self):
 
+		"""
+		Reads info about its peers
+		@return peers - list of neighbors
+		"""
 		f = open('peers/' + self.peers_file)
 		peers = []
 		header = True
@@ -67,18 +76,39 @@ class Node:
 		return peers
 
 	def get_ip_addr(self):
+
+		"""
+		Get the node's IP
+		@retun ip_addr 
+		"""
 		return self.ip_addr
 
 	def get_name(self):
+		"""
+		Get the node's name
+		@retun name
+		"""
 		return self.name
 
 	def get_id(self):
+		"""
+		Get the node's id
+		@retun node_id
+		"""
 		return self.node_id
 
 	def get_peer_list(self):
+		"""
+		Get the node's peer list
+		@retun peer_list 
+		"""
 		return self.peer_list
 
 	def sendTransaction(self, transaction):
+		"""
+		Sends transaction
+		@param transaction - Transaction object
+		"""
 		inputs = transaction.inputs
 		for input in inputs:
 			if input.hash != 'BLOCK-REWARD':
@@ -101,8 +131,8 @@ class Node:
 
 	def sendData(self, data, recv):
 		"""
-		:param data: compsed of messageType and payload
-		:param recv: node that recives the data
+		@param data - compsed of messageType and payload
+		@param recv - node that recives the data
 		"""
 		print("sending data:", data, "To:", recv.name,"IP:", recv.ip_addr, "Port:", recv.port_recv,"From:", self.name, "IP:", self.ip_addr)
 		time.sleep(1)

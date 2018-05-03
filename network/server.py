@@ -20,6 +20,11 @@ class Server(Thread):
 
 	def __init__(self, node):
 
+		"""
+		Constructor for Server
+		@param node - Node object
+		"""
+
 		Thread.__init__(self)
 		self.port = node.port_recv
 		self.host = node.get_ip_addr()
